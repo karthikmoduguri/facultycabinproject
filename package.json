@@ -4,8 +4,11 @@
   "description": "a faculty cabin details project",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon -r dotenv/config --experimental-json-modules src/index.js"
   },
   "author": "karthik",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
 }
