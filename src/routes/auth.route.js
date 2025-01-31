@@ -21,10 +21,18 @@ router.get(
     '/google/callback',
     passport.authenticate('google', { failureRedirect: '/h' }),
     (req, res) => {
-      console.log('ikkada daaka vachindhi');
+      if (!req.user.googleAuthenticated) {
+        // If user has not completed Google authentication, handle it
+        return res.status(403).json({
+          success: false,
+          message: 'Account setup incomplete. Please contact admin.',
+        });
+      }
+      
+      res.send("<a href='www.google.com'>success bro</a>")
       // Generate JWT and send to client
-      const token = generateToken(req.user);
-      res.status(200).json({ success: true, token });
+      const token = generateToken(req.user._id, req.user.role);
+      res.status(200).json({ success: true, token,message:'login successfull' });
     }
   );
 

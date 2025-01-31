@@ -8,6 +8,7 @@ import { router } from "./routes/auth.route.js";
 //import passport from "./middlewares/auth.middleware.js";
 import configurePassport from "./middlewares/auth.middleware.js";
 import passport from "passport";
+import adminroute from "./routes/admin.route.js"
 dotenv.config();
 
 const app = express();
@@ -33,5 +34,5 @@ configurePassport();
 app.use(passport.initialize());
 app.use(passport.session()); // Initialize Passport
 app.use('/api/v1/auth', router); // Google Auth routes
-
+app.use('/api/v1/admin',adminroute);
 export{app}

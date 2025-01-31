@@ -13,19 +13,34 @@ const configurePassport = () => {
       },
       async (accessToken, refreshToken, profile, done) => {
         try {
+          // Find user by Google ID
           let user = await User.findOne({ googleId: profile.id });
+      
           if (!user) {
-            user = await User.create({
-              googleId: profile.id,
-              email: profile.emails[0].value,
-              role: 'student', // Default role; customize as needed
-            });
+            // If no user is found with Google ID, try matching with email
+            user = await User.findOne({ email: profile.emails[0].value });
+      
+            if (user) {
+              // Update the user record with Google ID
+              user.googleId = profile.id;
+              user.googleAuthenticated = true; // Mark as authenticated
+              await user.save();
+            } else {
+              // If no matching email, create a new user
+              // user = await User.create({
+              //   googleId: profile.id,
+              //   email: profile.emails[0].value,
+              //   role: 'student', // Default role; customize as needed
+              // });
+              return res.status(404).json({success:false,message:'you r not a valid college user'})
+            }
           }
+      
           return done(null, user);
         } catch (err) {
           return done(err, null);
         }
-      }
+      }      
     )
   );
 

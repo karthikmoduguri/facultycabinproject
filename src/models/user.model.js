@@ -24,6 +24,10 @@ const userSchema = new mongoose.Schema({
         enum: ['student', 'faculty', 'admin'],
         required: true,
       },
+      googleAuthenticated: {
+        type: Boolean,
+        default: false, // Marks whether the user has connected their Google account
+      },
       addedByAdmin: {
         type: Boolean, // Tracks whether admin created the user
         default: false,
@@ -43,15 +47,21 @@ const userSchema = new mongoose.Schema({
 });
 
 
-userSchema.pre('save',async function (next){
-  if(this.isModified('password')){
-    this.password= await bcrypt.hash(this.password,10)
+// userSchema.pre('save',async function (next){
+//   if(this.isModified('password')){
+//     this.password= await bcrypt.hash(this.password,10)
+//   }
+
+//   next();
+
+// })
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) {
+    next();
   }
-
-  next();
-
-})
-
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+});
 userSchema.methods.matchPassword = async function (password) {
     return await bcrypt.compare(password, this.password);
 };
