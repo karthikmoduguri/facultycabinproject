@@ -14,6 +14,50 @@ const userSchema = new mongoose.Schema({
           return !this.googleId;
         },
       },
+      name: {
+        type: String,
+        required: true,
+      },
+      regno:{
+        type:Number,
+        required: function () {
+          return this.role === 'student';
+        },
+        select: function () {
+          return this.role === 'student';
+        }
+      },
+      batch:{
+        type:String,
+        required: function () {
+          return this.role === 'student';
+        },
+        select: function () {
+          return this.role === 'student';
+        },
+      },
+      department:{
+        type:String,
+        required:true
+      },
+      semester:{
+        type:Number,
+        required: function () {
+          return this.role === 'student';
+        },
+        select: function () {
+          return this.role === 'student';
+        },
+      },
+      section:{
+        type:String,
+        required: function () {
+          return this.role === 'student';
+        },
+        select: function () {
+          return this.role === 'student';
+        },
+      },
       googleId: {
         type: String, // Used for Google Authentication
         unique: true,

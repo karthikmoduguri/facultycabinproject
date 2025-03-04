@@ -5,7 +5,7 @@ const protect =asynchandler(async (req,res,next) => {
     let token;
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
         console.log("hi na");
-        console.log("Authorization Header:", req.headers.authorization);
+        // console.log("Authorization Header:", req.headers.authorization);
         try {
             token = req.headers.authorization.split(' ')[1];
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -32,7 +32,9 @@ const admin=async (req,res,next) => {
     if (req.user && req.user.role==='admin') {
         console.log("okokok");
         next();
+        // console.log("next exeucuet ayyindha");
     } else {
+        console.log("failed");
         return res.status(401).json({
             message:'failed, you r not admin '
         })

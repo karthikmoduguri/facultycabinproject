@@ -9,7 +9,7 @@ const configurePassport = () => {
       {
         clientID: process.env.GOOGLE_CLIENT_ID, // from Google Cloud
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL: 'http://localhost:3000/api/v1/auth/google/callback',
+        callbackURL: 'http://localhost:7000/api/v1/auth/google/callback',
       },
       async (accessToken, refreshToken, profile, done) => {
         try {
@@ -59,3 +59,18 @@ const configurePassport = () => {
 };
 
 export default configurePassport;
+
+
+/*
+google authentication flow 
+User clicks "Google Sign-In."
+Google server:
+Asks for email and password (if not signed in already).
+Verifies credentials.
+On successful login:
+Generates ID token or Access token.
+Sends token to your backend.
+Backend:
+extracts payload(email,profile pic etc ..)from token
+and checks if user is already present in db or not(email-check for uniqueness )
+*/

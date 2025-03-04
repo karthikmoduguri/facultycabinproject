@@ -8,6 +8,7 @@ import passport from "passport";
     //admin exist checking
     // console.log(email,password);
     const admin = await User.findOne({email,role: "admin"});
+    if(admin){console.log(true);}
     if(!admin){
         return res.status(404).json({
             success:false,
@@ -36,7 +37,7 @@ import passport from "passport";
 });
 
 export const addUser = asynchandler(async (req, res) => {
-    const { email, role } = req.body;
+    const { email, role,name,regno,batch,department,semester,section } = req.body;
   
     if (!["student", "faculty"].includes(role)) {
       return res.status(400).json({ success: false, message: "Invalid role" });
@@ -51,6 +52,12 @@ export const addUser = asynchandler(async (req, res) => {
     const user = new User({
       email,
       role,
+      name,
+      regno,
+      batch,
+      department,
+      semester,
+      section,
       password: defaultPassword,
       addedByAdmin: true,
     });
@@ -61,10 +68,23 @@ export const addUser = asynchandler(async (req, res) => {
 
   export const deleteUser = asynchandler(async (req, res) => {
     try {
-      const { id } = req.params; // Assuming userId is passed as a parameter in the URL
+      const { id } = req.params; // Get ID from params
+      const { email } = req.body; // Get Email from body
   
-      // Use findByIdAndDelete to delete the user
-      const user = await User.findByIdAndDelete(id);
+      let user;
+  
+      if (id) {
+        // Delete by ID (URL parameter)
+        user = await User.findByIdAndDelete(id);
+      } else if (email) {
+        // Delete by Email (Request body)
+        user = await User.findOneAndDelete({ email });
+      } else {
+        return res.status(400).json({
+          success: false,
+          message: "Please provide a user ID or Email",
+        });
+      }
   
       if (!user) {
         return res.status(404).json({
@@ -76,7 +96,6 @@ export const addUser = asynchandler(async (req, res) => {
       res.status(200).json({
         success: true,
         message: "User deleted successfully",
-        user,
       });
     } catch (error) {
       res.status(500).json({
@@ -86,6 +105,4 @@ export const addUser = asynchandler(async (req, res) => {
       });
     }
   });
-
-
   
