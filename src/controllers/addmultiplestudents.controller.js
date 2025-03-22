@@ -26,6 +26,12 @@ const addmultipleuser=asynchandler(async(req,res)=>{
                     const usersToInsert = users.map((row) => ({
                         email: row.email,
                         role: "student"||row.role,
+                        name: row.name,
+                        department: row.department,
+                        semester: row.semester,
+                        section: row.section,
+                        batch: row.batch,
+                        regno: row.regno,
                         password:"newpass"
                       }));
                       console.log(usersToInsert);

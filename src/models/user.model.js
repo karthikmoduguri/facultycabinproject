@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
-
+import { Department } from "./department.model.js";
 const userSchema = new mongoose.Schema({
     email: {
         type: String,
@@ -37,7 +37,8 @@ const userSchema = new mongoose.Schema({
         },
       },
       department:{
-        type:String,
+        type:mongoose.Schema.Types.ObjectId,
+        ref: "Department",
         required:true
       },
       semester:{

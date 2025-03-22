@@ -9,6 +9,11 @@ import { router } from "./routes/auth.route.js";
 import configurePassport from "./middlewares/auth.middleware.js";
 import passport from "passport";
 import adminroute from "./routes/admin.route.js"
+import timetable from "./routes/timetable.route.js"
+import cabinnum from "./routes/cabinnum.route.js"
+import  cabinbook from "./routes/cabinbook.route.js"
+import gemini from "./routes/Gemini.route.js";
+import department from "./routes/department.route.js"
 dotenv.config();
 
 const app = express();
@@ -35,4 +40,9 @@ app.use(passport.initialize());
 app.use(passport.session()); // Initialize Passport
 app.use('/api/v1/auth', router); // Google Auth routes
 app.use('/api/v1/admin',adminroute);
+app.use('/api/v1/timetable',timetable);
+app.use('/api/v1/cabinnum',cabinnum);
+app.use('/api/v1/cabinbook',cabinbook);
+app.use('/api/v1/ai', gemini);
+app.use('/api/v1/department', department);
 export{app}

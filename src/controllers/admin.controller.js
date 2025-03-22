@@ -3,6 +3,7 @@ import { asynchandler } from "../utils/asynchandler.js";
 import bcrypt from "bcryptjs";
 import generateToken from "../utils/jwtUtils.js";
 import passport from "passport";
+import { Department } from "../models/department.model.js";
  export const adminlogin = asynchandler(async (req,res,next) => {
     const {email ,password}=req.body;
     //admin exist checking
@@ -47,6 +48,12 @@ export const addUser = asynchandler(async (req, res) => {
     if (existingUser) {
       return res.status(400).json({ success: false, message: "User already exists" });
     }
+
+    const departmentData = await Department.findOne({ code: department });
+    if (!departmentData) {
+        return res.status(404).json({ success: false, message: "Department not found" });
+    }
+
     const defaultPassword = "Default@123";
   
     const user = new User({
@@ -55,7 +62,7 @@ export const addUser = asynchandler(async (req, res) => {
       name,
       regno,
       batch,
-      department,
+      department: departmentData._id,
       semester,
       section,
       password: defaultPassword,
