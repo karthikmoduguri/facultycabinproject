@@ -27,10 +27,42 @@ export const addcabin=asynchandler(async(req,res)=>{
     cabin.cabinNo=cabinNo;
 }
     
-    await cabin.save();
+    // await cabin.save();
 
 return res.status(200).json({
     success:true,
     message:"cabin added successfully"
 })
 });
+
+
+export const getcabinnum =async (req,res) => {
+    try {
+        const {facultyId}=req.params;
+
+        if(!facultyId){
+            return res.status(404).json({
+                success:false,
+                message:"faculty not found"
+            })
+        }
+
+        const cabin=await Cabin.findOne({facultyId});
+        if(!cabin){
+            return res.status(404).json({
+                success:false,
+                message:"cabin not found"
+            })  
+        }
+
+        res.status(200).json({
+            success:true,
+            data:cabin
+        })
+    } catch (error) {
+        res.status(500).json({
+            success:false,
+            message:error.message
+        })
+    }
+}

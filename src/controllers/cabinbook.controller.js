@@ -1,9 +1,41 @@
 import { User } from "../models/user.model.js";
 import{CabinBooking} from "../models/cabinbooking.model.js";
 import { io } from "../index.js";
-
+import { TimeTable } from "../models/timetable.model.js";
 
 /** 📌 Student Books a Cabin */
+// export const bookCabin = async (req, res) => {
+//     try {
+//         const { studentId, facultyId, date, timeSlot } = req.body;
+
+//         // Check if student exists
+//         const student = await User.findOne({ _id: studentId, role: "student" });
+//         if (!student) {
+//             return res.status(404).json({ success: false, message: "Student not found" });
+//         }
+
+//         // Check if faculty exists
+//         const faculty = await User.findOne({ _id: facultyId, role: "faculty" });
+//         if (!faculty) {
+//             return res.status(404).json({ success: false, message: "Faculty not found" });
+//         }
+
+//         // Check if the slot is already booked
+//         const existingBooking = await CabinBooking.findOne({ facultyId, date, timeSlot });
+//         if (existingBooking) {
+//             return res.status(400).json({ success: false, message: "Time slot already booked" });
+//         }
+
+//         // Create new booking
+//         const booking = new CabinBooking({ studentId, facultyId, date, timeSlot });
+//         await booking.save();
+//         io.emit("newBooking", { studentId, facultyId, date, timeSlot });
+//         return res.status(201).json({ success: true, message: "Cabin booked successfully", booking });
+//     } catch (error) {
+//         return res.status(500).json({ success: false, message: error.message });
+//     }
+// };
+
 export const bookCabin = async (req, res) => {
     try {
         const { studentId, facultyId, date, timeSlot } = req.body;
@@ -20,21 +52,42 @@ export const bookCabin = async (req, res) => {
             return res.status(404).json({ success: false, message: "Faculty not found" });
         }
 
-        // Check if the slot is already booked
-        const existingBooking = await CabinBooking.findOne({ facultyId, date, timeSlot });
-        if (existingBooking) {
-            return res.status(400).json({ success: false, message: "Time slot already booked" });
+        // Fetch faculty timetable
+        const facultyTimetable = await TimeTable.findOne({ facultyId });
+
+        if (!facultyTimetable) {
+            return res.status(400).json({ success: false, message: "Faculty timetable not found" });
+        }
+
+        // Extract the weekday from the date
+        const weekday = new Date(date).toLocaleString("en-US", { weekday: "long" }).toLowerCase();
+        console.log(weekday);
+        // Get schedule for the requested weekday
+        const facultySchedule = facultyTimetable.week?.[weekday] || [];
+
+        // Check if the requested time slot is an "INCLASS" period
+        const inClassPeriod = facultySchedule.find(period => period.time === timeSlot && period.status === "INCLASS");
+
+        if (inClassPeriod) {
+            return res.status(206).json({ success: true, message: "Cannot book during class hours please choose another time slot" });
+        }
+
+        const existingBookings = await CabinBooking.countDocuments({ facultyId, date, timeSlot });
+        if (existingBookings >= 3) {
+            return res.status(400).json({ success: false, message: "Slot is full (3 students max)" });
         }
 
         // Create new booking
         const booking = new CabinBooking({ studentId, facultyId, date, timeSlot });
         await booking.save();
         io.emit("newBooking", { studentId, facultyId, date, timeSlot });
+
         return res.status(201).json({ success: true, message: "Cabin booked successfully", booking });
     } catch (error) {
         return res.status(500).json({ success: false, message: error.message });
     }
 };
+
 
 /** 📌 Faculty Views All Bookings */
 export const getFacultyBookings = async (req, res) => {
@@ -48,7 +101,11 @@ export const getFacultyBookings = async (req, res) => {
         }
 
         // Get all bookings for faculty
-        const bookings = await CabinBooking.find({ facultyId }).populate("studentId", "username");
+        const bookings = await CabinBooking.find({ facultyId }).populate({
+    path: "studentId",
+   select: "name regno batch section semester"
+  });
+        // console.log(bookings);
 
         return res.status(200).json({ success: true, bookings });
     } catch (error) {

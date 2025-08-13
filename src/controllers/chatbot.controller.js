@@ -55,7 +55,13 @@ export const askChatbot = async (req, res) => {
 
         // 3️⃣ Send Query + Data to Gemini AI
         const prompt = `Student asked: "${query}". Here is the latest data: ${JSON.stringify(contextData)}. 
-        Please provide an accurate response based on this information.`;
+        Please provide an accurate response based on this information.
+        please ensure that you response according to the this data ${JSON.stringify(contextData)} and do not deviate from it.
+        if there is no matching result from the request made by student and the data there with us then careflly think and reply accordingly 
+        
+        see the above reply you give carefully but if a user chat with you normally then chat with them normally okk 
+        you know what to do you are intelligent ai agent okk!!
+        `;
 
         const result = await model.generateContent(prompt);
 

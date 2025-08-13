@@ -76,16 +76,25 @@ export const addTimeTable = async (req, res) => {
     }
 };
 
-// Helper function to merge existing periods with provided data
-const mergePeriods = (defaultPeriods, providedPeriods) => {
-    let merged = [...defaultPeriods];
+const mergePeriods = (oldPeriods, providedPeriods) => {
+    let merged = [...oldPeriods];
 
     providedPeriods.forEach(provided => {
         const index = merged.findIndex(p => p.period === provided.period);
         if (index !== -1) {
-            merged[index] = provided; // Replace default period if provided
+            // Only update the changed fields
+            merged[index] = {
+                ...merged[index],
+                ...provided,
+                status: provided.status && provided.status !== "" 
+                    ? provided.status 
+                    : merged[index].status || "Free"
+            };
         }
     });
 
     return merged;
 };
+
+
+

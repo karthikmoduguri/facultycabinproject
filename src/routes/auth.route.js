@@ -29,10 +29,26 @@ router.get(
         });
       }
       
-      res.send("<a href='https://www.google.com/'>login success please click here</a>")
+      // res.redirect(`http://localhost:5173/student-dashboard?token=${token}`);
       // Generate JWT and send to client
       const token = generateToken(req.user._id, req.user.role);
-      res.status(200).json({ success: true, token,message:'login successfull' });
+const userme = req.user; // Full user object, not just _id
+
+console.log("Google Login User:", req.user);
+
+// Encode user data to pass in URL
+const encodedUser = encodeURIComponent(JSON.stringify(userme));
+
+// Redirect based on role
+if (req.user.role === 'student') {
+  res.redirect(`http://localhost:5173/student-dashboard?token=${token}&userme=${encodedUser}`);
+} else if (req.user.role === 'faculty') {
+  res.redirect(`http://localhost:5173/faculty-dashboard?token=${token}&userme=${encodedUser}`);
+} else {
+  res.redirect(`http://localhost:5173/unauthorized`); // Optional: default or error page
+}
+
+      res.status(200).json({ success: true, token,userme,message:'login successfull' });
     }
   );
 

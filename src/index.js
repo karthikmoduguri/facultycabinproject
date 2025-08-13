@@ -37,7 +37,7 @@ connectdb()
 
             socket.on("newBooking", (data) => {
                 console.log("New booking:", data);
-                io.emit("bookingUpdate", data); // Notify all clients
+                io.emit("bookingUpdate", data); 
             });
 
             socket.on("updateBookingStatus", (data) => {
